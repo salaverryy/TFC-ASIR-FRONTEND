@@ -8,6 +8,7 @@ import {
   Menu,
   Typography,
   message,
+  Popconfirm,
 } from 'antd';
 import {
   EyeOutlined,
@@ -68,12 +69,24 @@ const UsuariosPage = () => {
             <EyeOutlined /> Ver
           </Link>
           {role === 'ADMIN' && (
-            <Button
-              danger
-              size="small"
-              onClick={() => message.info('Eliminar no implementado')}
-              icon={<DeleteOutlined />}
-            />
+            <Popconfirm
+              title="¿Estás seguro de que deseas eliminar este usuario?"
+              description={`Esta acción no se puede deshacer. Usuario: ${record.email}`}
+              okText="Sí"
+              cancelText="No"
+              onConfirm={async () => {
+                try {
+                  await api.delete(`/api/users/${record.externalId}`);
+                  message.success('Usuario eliminado correctamente');
+                  fetchUsers(); // 👈 vuelve a cargar la lista
+                } catch (error) {
+                  console.error('Error al eliminar usuario:', error);
+                  message.error('No se pudo eliminar el usuario');
+                }
+              }}
+            >
+              <Button danger size="small" icon={<DeleteOutlined />} />
+            </Popconfirm>
           )}
         </Space>
       ),
