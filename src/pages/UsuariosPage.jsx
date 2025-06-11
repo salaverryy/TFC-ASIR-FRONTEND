@@ -29,7 +29,7 @@ const UsuariosPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/users');
+      const response = await api.get('api/users');
       console.log("Respuesta del backend:", response.data);
 
       const data = Array.isArray(response.data)
