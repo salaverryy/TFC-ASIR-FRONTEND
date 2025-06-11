@@ -67,7 +67,7 @@ const UsuariosPage = () => {
           <Link to={`/usuarios/${record.id}`} style={{ color: '#1890ff' }}>
             <EyeOutlined /> Ver
           </Link>
-          {role === 'admin' && (
+          {role === 'ADMIN' && (
             <Button
               danger
               size="small"
@@ -127,7 +127,7 @@ const UsuariosPage = () => {
         </Typography.Title>
 
         <div style={{ marginBottom: 16 }}>
-          {role === 'admin' && (
+          {role === 'ADMIN' && (
             <>
               <Button
                 type="primary"
@@ -154,7 +154,7 @@ const UsuariosPage = () => {
         </div>
 
         <Table
-          rowSelection={role === 'admin' ? rowSelection : undefined}
+          rowSelection={role === 'ADMIN' ? rowSelection : undefined}
           columns={columns}
           dataSource={users}
           pagination={{ pageSize: 10 }}
