@@ -64,7 +64,7 @@ const UsuariosPage = () => {
       key: 'acciones',
       render: (_, record) => (
         <Space>
-          <Link to={`/usuarios/${record.id}`} style={{ color: '#1890ff' }}>
+          <Link to={`/usuarios/${record.externalId}`} style={{ color: '#1890ff' }}>
             <EyeOutlined /> Ver
           </Link>
           {role === 'ADMIN' && (
@@ -79,7 +79,6 @@ const UsuariosPage = () => {
       ),
     },
   ];
-
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
       <Header
