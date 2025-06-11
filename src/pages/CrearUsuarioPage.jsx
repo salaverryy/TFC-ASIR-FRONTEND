@@ -23,7 +23,7 @@ const CrearUsuarioPage = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      await api.post('/users', values);
+      await api.post('/api/users', values);
       message.success('Usuario creado correctamente');
       navigate('/users');
     } catch (error) {
