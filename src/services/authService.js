@@ -1,42 +1,24 @@
 // src/services/authService.js
-import {
-  CognitoUserPool,
-  CognitoUser,
-  AuthenticationDetails,
-} from 'amazon-cognito-identity-js';
-
-import { USER_POOL_ID, CLIENT_ID } from '../awsConfig.js';
-
-const userPool = new CognitoUserPool({
-  UserPoolId: USER_POOL_ID,
-  ClientId: CLIENT_ID,
-});
+import api from './api'; // Asegúrate de que esto apunte a axios con baseURL: http://localhost:8080
 
 const login = async (email, password) => {
-  return new Promise((resolve, reject) => {
-    const user = new CognitoUser({ Username: email, Pool: userPool });
-    const authDetails = new AuthenticationDetails({ Username: email, Password: password });
+  try {
+    const response = await api.post('/auth/login', { email, password });
 
-    user.authenticateUser(authDetails, {
-      onSuccess: (result) => {
-        const token = result.getIdToken().getJwtToken();
+    const { accessToken, role } = response.data;
 
-        // ✅ Extraemos el payload del token
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const role = payload['custom:role'] || 'usuario';
+    if (!accessToken || !role) {
+      throw new Error('Respuesta inválida del servidor');
+    }
 
-        // ✅ Guardamos en localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('role', role);
 
-        resolve({ success: true, token, role });
-      },
-      onFailure: (err) => {
-        console.error('Login error:', err);
-        reject(err);
-      },
-    });
-  });
+    return { success: true, token: accessToken };
+  } catch (error) {
+    console.error('Error al hacer login:', error);
+    throw error;
+  }
 };
 
 export default { login };

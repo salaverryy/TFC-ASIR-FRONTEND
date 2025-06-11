@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       const result = await authService.login(email, password);
         if (result.success) {
       setToken(result.token);
-      setRole(result.role); // ✅
+      setRole(result.role); // 
       return true;
     }
     } catch (err) {
