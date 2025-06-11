@@ -15,6 +15,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { role, logout } = useContext(AuthContext);
 
+  console.log("Rol del usuario:", role);
+
   const adminView = (
     <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
       <Card
@@ -130,12 +132,12 @@ const Dashboard = () => {
 
       <Content style={{ padding: "40px" }}>
         <Typography.Title level={2} style={{ color: "#fff", marginBottom: 30 }}>
-          {role === "admin"
+          {role === "ADMIN"
             ? "Panel de administración ASIR"
             : "Panel de usuario"}
         </Typography.Title>
 
-        {role === "admin" ? adminView : userView}
+        {role === "ADMIN" ? adminView : userView}
       </Content>
 
       <Footer style={{ textAlign: "center", backgroundColor: "#001529", color: "#fff" }}>

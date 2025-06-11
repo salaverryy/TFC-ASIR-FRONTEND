@@ -24,7 +24,7 @@ const login = async (email, password) => {
 
     console.log(localStorage.getItem('role'));
 
-    return { success: true, token: accessToken };
+    return { success: true, token: accessToken, role };
   } catch (error) {
     console.error('Error al hacer login:', error);
     throw error;
