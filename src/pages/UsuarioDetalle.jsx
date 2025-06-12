@@ -123,9 +123,6 @@ const UsuarioDetalle = () => {
               <Descriptions.Item label="Rol">
                 {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
               </Descriptions.Item>
-              <Descriptions.Item label="Estado">
-                {user.status?.charAt(0).toUpperCase() + user.status?.slice(1)}
-              </Descriptions.Item>
             </Descriptions>
 
             <div style={{ marginTop: 30 }}>

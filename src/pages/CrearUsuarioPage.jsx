@@ -56,19 +56,8 @@ const CrearUsuarioPage = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item label="Rol" name="role" rules={[{ required: true }]}>
-            <Select>
-              <Option value="admin">Admin</Option>
-              <Option value="user">Usuario</Option>
-            </Select>
-          </Form.Item>
-
           <Form.Item label="Teléfono" name="phone">
             <Input />
-          </Form.Item>
-
-          <Form.Item label="Contraseña" name="password" rules={[{ required: true }]}>
-            <Input.Password />
           </Form.Item>
 
           <Form.Item>
