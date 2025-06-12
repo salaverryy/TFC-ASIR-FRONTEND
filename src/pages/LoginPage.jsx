@@ -1,62 +1,20 @@
-import React, { useContext, useState } from "react";
-import { Button, Card, Form, Input, Typography, Modal, message } from "antd";
+import React, { useContext } from "react";
+import { Button, Card, Form, Input, Typography, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [error, setError] = useState("");
-
-  // Estados para nueva contraseña
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [session, setSession] = useState("");
-  const [emailTemp, setEmailTemp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const onFinish = async (values) => {
-    setError("");
-    const result = await login(values.email, values.password);
-
-    if (result === true) {
+    const success = await login(values.email, values.password);
+    if (success) {
+      message.success("Acceso concedido");
       navigate("/dashboard");
-    } else if (result?.reason === "NEW_PASSWORD_REQUIRED") {
-      setEmailTemp(values.email);
-      setSession(result.session);
-      setShowPasswordModal(true);
     } else {
-      setError("⚠️ Credenciales inválidas. Intenta nuevamente.");
-    }
-  };
-
-  const handlePasswordChange = async () => {
-    if (newPassword !== confirmPassword) {
-      message.error("Las contraseñas no coinciden.");
-      return;
-    }
-
-    try {
-      await axios.post("http://localhost:8080/auth/change-password", {
-        email: emailTemp,
-        newPassword,
-        session,
-      });
-
-      message.success("✅ Contraseña cambiada correctamente.");
-      setShowPasswordModal(false);
-      setNewPassword("");
-      setConfirmPassword("");
-      setSession("");
-      setEmailTemp("");
-      message.info("Inicia sesión con tu nueva contraseña.");
-      // Opcional: recarga la página o redirige
-      // window.location.reload();
-    } catch (err) {
-      console.error(err);
-      message.error("❌ Error al cambiar la contraseña.");
+      message.error("Credenciales inválidas");
     }
   };
 
@@ -64,7 +22,7 @@ const LoginPage = () => {
     <div
       style={{
         minHeight: "100vh",
-        overflow: "hidden",
+        overflow: "hidden", // 🚫 Bloquea scroll
         backgroundImage: `url(https://images.unsplash.com/photo-1581091012184-7e0cdfbb6795?auto=format&fit=crop&w=1950&q=80)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -76,6 +34,7 @@ const LoginPage = () => {
         position: "relative",
       }}
     >
+      {/* Capa oscura para contraste */}
       <div
         style={{
           position: "absolute",
@@ -85,11 +44,12 @@ const LoginPage = () => {
         }}
       />
 
+      {/* Tarjeta de login */}
       <Card
         style={{
           zIndex: 2,
           width: "100%",
-          maxWidth: 520,
+          maxWidth: 520, // 📏 Más grande
           padding: 50,
           borderRadius: 20,
           background: "rgba(15, 15, 15, 0.65)",
@@ -127,7 +87,6 @@ const LoginPage = () => {
               }}
             />
           </Form.Item>
-
           <Form.Item
             label={<span style={{ color: "#eee" }}>Contraseña</span>}
             name="password"
@@ -144,13 +103,6 @@ const LoginPage = () => {
               }}
             />
           </Form.Item>
-
-          {error && (
-            <Typography.Text type="danger" style={{ display: "block", marginBottom: 16 }}>
-              {error}
-            </Typography.Text>
-          )}
-
           <Form.Item>
             <Button
               type="primary"
@@ -170,24 +122,6 @@ const LoginPage = () => {
           </Form.Item>
         </Form>
       </Card>
-
-      <Modal
-        open={showPasswordModal}
-        title="Es necesario cambiar la contraseña"
-        onCancel={() => setShowPasswordModal(false)}
-        onOk={handlePasswordChange}
-        okText="Guardar"
-        cancelText="Cancelar"
-      >
-        <Form layout="vertical">
-          <Form.Item label="Nueva contraseña" required>
-            <Input.Password value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          </Form.Item>
-          <Form.Item label="Confirmar contraseña" required>
-            <Input.Password value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-          </Form.Item>
-        </Form>
-      </Modal>
 
       <style>
         {`
