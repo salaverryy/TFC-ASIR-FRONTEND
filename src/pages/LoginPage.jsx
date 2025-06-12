@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react"; // ← IMPORTANTE: useState
 import { Button, Card, Form, Input, Typography, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -7,14 +7,24 @@ import { AuthContext } from "../context/AuthContext";
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [formError, setFormError] = useState(null); // ✅ AQUÍ VA
 
   const onFinish = async (values) => {
-    const success = await login(values.email, values.password);
-    if (success) {
-      message.success("Acceso concedido");
-      navigate("/dashboard");
-    } else {
-      message.error("Credenciales inválidas");
+    try {
+      const result = await login(values.email, values.password);
+      console.log("🔴 Resultado del login:", result);
+
+      if (result) {
+        console.log("🔵 Acceso concedido:", result);
+        message.success("Acceso concedido");
+        navigate("/users");
+      } else {
+        setFormError(result.message || "Credenciales inválidas"); // 👈 esto mostrará el error debajo
+      }
+    } catch (error) {
+      const msg = error?.response?.data?.message || "Error inesperado";
+      console.error("⛔ Error inesperado:", msg);
+      setFormError(msg); // también lo mostramos en el campo
     }
   };
 
@@ -91,6 +101,8 @@ const LoginPage = () => {
             label={<span style={{ color: "#eee" }}>Contraseña</span>}
             name="password"
             rules={[{ required: true, message: "Ingresa tu contraseña" }]}
+            help={formError} // ✅ muestra el mensaje de error
+            validateStatus={formError ? "error" : ""} // ✅ marca el campo en rojo
           >
             <Input.Password
               prefix={<LockOutlined />}

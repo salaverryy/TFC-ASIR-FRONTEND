@@ -139,28 +139,14 @@ const UsuariosPage = () => {
           Panel de Usuarios
         </div>
 
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['usuarios']}
-          items={[
-            {
-              key: 'dashboard',
-              label: 'Dashboard',
-              onClick: () => navigate('/dashboard'),
-            },
-            {
-              key: 'usuarios',
-              label: 'Usuarios',
-              onClick: () => navigate('/users'),
-            },
-            {
-              key: 'logout',
-              label: 'Cerrar sesión',
-              onClick: () => navigate('/'),
-            },
-          ]}
-        />
+        <Space>
+          <Button type="link" style={{ color: '#fff' }} onClick={() => navigate('/users')}>
+            Usuarios
+          </Button>
+          <Button type="link" style={{ color: '#fff' }} onClick={() => navigate('/')}>
+            Cerrar sesión
+          </Button>
+        </Space>
       </Header>
 
       <Content style={{ padding: '24px 40px' }}>
