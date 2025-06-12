@@ -44,6 +44,8 @@ const LoginPage = () => {
       const decodedToken = jwtDecode(accessToken);
       const role = decodedToken["cognito:groups"]?.[0] ?? "UNKNOWN";
 
+      console.log("🔑 Role::", role);
+
       localStorage.setItem("token", accessToken);
       localStorage.setItem("role", role);
 

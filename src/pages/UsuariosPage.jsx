@@ -26,6 +26,7 @@ import api from "../services/api";
 const { Header, Content, Footer } = Layout;
 
 const UsuariosPage = () => {
+  const { logout } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const { role } = useContext(AuthContext);
@@ -143,7 +144,14 @@ const UsuariosPage = () => {
           <Button type="link" style={{ color: '#fff' }} onClick={() => navigate('/users')}>
             Usuarios
           </Button>
-          <Button type="link" style={{ color: '#fff' }} onClick={() => navigate('/')}>
+          <Button
+            type="link"
+            style={{ color: '#fff' }}
+            onClick={() => {
+              logout();          // 🔴 elimina token y role del localStorage
+              navigate('/');     // 🔁 redirige a la página de login
+            }}
+          >
             Cerrar sesión
           </Button>
         </Space>
