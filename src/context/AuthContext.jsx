@@ -9,16 +9,15 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(localStorage.getItem('role') || 'usuario');
 
   const login = async (email, password) => {
-    try {
-      const result = await authService.login(email, password);
-        if (result.success) {
+    const result = await authService.login(email, password);
+
+    if (result.success) {
       setToken(result.token);
-      setRole(result.role); // 
-      return true;
+      setRole(result.role);
     }
-    } catch (err) {
-      return false;
-    }
+
+    // 🔁 Devolvemos siempre el objeto completo para que LoginPage maneje el resultado
+    return result;
   };
 
   const logout = () => {
@@ -34,5 +33,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-
