@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useContext } from 'react';
 import {
   Table,
@@ -9,12 +8,16 @@ import {
   Typography,
   message,
   Popconfirm,
+  Modal,
+  Form,
+  Input,
 } from 'antd';
 import {
   EyeOutlined,
   DeleteOutlined,
   UserAddOutlined,
   UserOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -28,15 +31,16 @@ const UsuariosPage = () => {
   const { role } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [form] = Form.useForm();
+
   const fetchUsers = async () => {
     try {
       const response = await api.get('api/users');
-      console.log("Respuesta del backend:", response.data);
-
       const data = Array.isArray(response.data)
         ? response.data
         : response.data.users || [];
-
       setUsers(data);
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
@@ -45,9 +49,27 @@ const UsuariosPage = () => {
   };
 
   useEffect(() => {
-    console.log("🧪 Rol desde AuthContext:", role); // debug
     fetchUsers();
   }, [role]);
+
+  const showEditModal = (user) => {
+    setCurrentUser(user);
+    setIsEditModalVisible(true);
+    form.setFieldsValue(user);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const updatedUser = await form.validateFields();
+      await api.put(`/api/users/${currentUser.externalId}`, updatedUser);
+      message.success("Usuario actualizado correctamente");
+      setIsEditModalVisible(false);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      message.error("No se pudo actualizar el usuario");
+    }
+  };
 
   const rowSelection = {
     selectedRowKeys,
@@ -69,29 +91,37 @@ const UsuariosPage = () => {
             <EyeOutlined /> Ver
           </Link>
           {role === 'ADMIN' && (
-            <Popconfirm
-              title="¿Estás seguro de que deseas eliminar este usuario?"
-              description={`Esta acción no se puede deshacer. Usuario: ${record.email}`}
-              okText="Sí"
-              cancelText="No"
-              onConfirm={async () => {
-                try {
-                  await api.delete(`/api/users/${record.externalId}`);
-                  message.success('Usuario eliminado correctamente');
-                  fetchUsers(); // 👈 vuelve a cargar la lista
-                } catch (error) {
-                  console.error('Error al eliminar usuario:', error);
-                  message.error('No se pudo eliminar el usuario');
-                }
-              }}
-            >
-              <Button danger size="small" icon={<DeleteOutlined />} />
-            </Popconfirm>
+            <>
+              <Button
+                icon={<EditOutlined />}
+                size="small"
+                onClick={() => showEditModal(record)}
+              />
+              <Popconfirm
+                title="¿Estás seguro de que deseas eliminar este usuario?"
+                description={`Esta acción no se puede deshacer. Usuario: ${record.email}`}
+                okText="Sí"
+                cancelText="No"
+                onConfirm={async () => {
+                  try {
+                    await api.delete(`/api/users/${record.externalId}`);
+                    message.success('Usuario eliminado correctamente');
+                    fetchUsers();
+                  } catch (error) {
+                    console.error('Error al eliminar usuario:', error);
+                    message.error('No se pudo eliminar el usuario');
+                  }
+                }}
+              >
+                <Button danger size="small" icon={<DeleteOutlined />} />
+              </Popconfirm>
+            </>
           )}
         </Space>
       ),
     },
   ];
+
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
       <Header
@@ -179,6 +209,30 @@ const UsuariosPage = () => {
       <Footer style={{ textAlign: 'center', background: '#001529', color: '#fff' }}>
         <p>© 2025 Panel IT ASIR - Todos los derechos reservados</p>
       </Footer>
+
+      <Modal
+        open={isEditModalVisible}
+        title="Editar usuario"
+        onCancel={() => setIsEditModalVisible(false)}
+        onOk={handleEditSubmit}
+        okText="Guardar cambios"
+        cancelText="Cancelar"
+      >
+        <Form layout="vertical" form={form}>
+          <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="lastName" label="Apellidos" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="phone" label="Teléfono" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };
