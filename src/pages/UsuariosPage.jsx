@@ -22,10 +22,12 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from "../services/api";
+import { jwtDecode } from "jwt-decode";
 
 const { Header, Content, Footer } = Layout;
 
 const UsuariosPage = () => {
+  const [userInfo, setUserInfo] = useState(null);
   const { logout } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -48,6 +50,26 @@ const UsuariosPage = () => {
       message.error('No se pudieron cargar los usuarios.');
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    const decoded = jwtDecode(token);
+    const userId = decoded.sub;
+
+    const fetchUserInfo = async () => {
+      try {
+        const response = await api.get(`/api/users/${userId}`);
+        setUserInfo(response.data);
+      } catch (error) {
+        console.error("❌ Error obteniendo datos del usuario:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -161,6 +183,11 @@ const UsuariosPage = () => {
         <Typography.Title level={2} style={{ color: '#333' }}>
           Administración de Usuarios
         </Typography.Title>
+        {userInfo && (
+          <Typography.Text type="secondary" style={{ fontSize: 16, marginBottom: 20, display: "block" }}>
+            Bienvenido(a) {userInfo.name} {userInfo.lastName} con Rol {userInfo.role}
+          </Typography.Text>
+        )}
 
         <div style={{ marginBottom: 16 }}>
           {role === 'ADMIN' && (
